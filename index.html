@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>48Review — Ancient Greece</title>
+  <style>
+    :root { --bg:#48dfe8; --panel:#cfeef7; --border:#6b9eaa; --text:#17323a; }
+    * { box-sizing:border-box; }
+    body { margin:0; padding:18px; background:var(--bg); color:var(--text); font-family:Arial,sans-serif; text-align:center; }
+    h1 { margin:0 0 8px; }
+    .score { margin-bottom:14px; }
+    .feedback { min-height:1.5em; margin:10px 0; font-weight:bold; }
+    .grid { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; max-width:900px; margin:0 auto; }
+    .answerForm { display:block; min-width:0; width:100%; margin:0; }
+    .choice {
+      display:block;
+      width:100%;
+      min-height:52px;
+      padding:8px 4px;
+      border:2px solid var(--border);
+      border-radius:8px;
+      background:var(--panel);
+      color:var(--text);
+      font-size:15px;
+      cursor:pointer;
+    }
+    .choice:disabled { cursor:default; opacity:1; }
+    .choice.correct {
+      outline:4px solid #167c45;
+      outline-offset:1px;
+      background:#d9f7df;
+      font-weight:bold;
+    }
+    .mark { margin-left:5px; font-size:1.25em; color:#167c45; }
+    .next {
+      margin-top:18px;
+      padding:10px 20px;
+      font-size:16px;
+      font-weight:bold;
+      cursor:pointer;
+    }
+    .restart { margin-top:18px; padding:9px 16px; cursor:pointer; }
+    @media (max-width:700px) {
+      .grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+      .choice { font-size:14px; }
+    }
+    @media (max-width:430px) {
+      body { padding:10px; }
+      .grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+      .choice { font-size:13px; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Ancient Greece</h1>
+
+  {% if finished %}
+    <h2>Congratulations!</h2>
+    <p>You have completed all 48 questions.</p>
+    <p class="score">Score: {{ score_numerator }}/{{ score_denominator }} — {{ percentage }}%</p>
+    <form method="post" action="{{ url_for('restart') }}">
+      <button class="restart" type="submit">Start again</button>
+    </form>
+
+  {% else %}
+    <div class="score">Score: {{ score_numerator }}/{{ score_denominator }} — {{ percentage }}%</div>
+    <p><strong>{{ clue }}</strong></p>
+    <div class="feedback" aria-live="polite">{{ feedback }}</div>
+
+    <div class="grid" id="choiceGrid">
+      {% for word in choices %}
+        {% set word_index = loop.index0 %}
+        
+        <form method="post" action="{{ url_for('answer') }}" class="answerForm">
+          <input type="hidden" name="answer" value="{{ word }}">
+          <button type="submit"
+                  class="choice{% if word_index in checked %} correct{% endif %}"
+                  {% if correct_selected %}disabled{% endif %}>
+            {{ word }}{% if word_index in checked %}<span class="mark" aria-label="correct">✓</span>{% endif %}
+          </button>
+        </form>
+      {% endfor %}
+    </div>
+
+    {% if correct_selected %}
+      <form method="post" action="{{ url_for('next_question') }}">
+        <button class="next" type="submit">NEXT QUESTION</button>
+      </form>
+    {% endif %}
+  {% endif %}
+<p class="copyright">© 2026 Joe Lonergan — 48Review. All Rights Reserved.</p>
+</body>
+</html>
