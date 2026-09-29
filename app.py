@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, session, redirect, url_for
-
+import random
 app = Flask(__name__)
 app.secret_key = "48review-greece-local-test-key"
 
@@ -10,6 +10,7 @@ WORDS = [answer for clue, answer in QUESTIONS]
 def start_game():
     session.clear()
     session["remaining"] = ORIGINAL_ORDER.copy()
+    random.shuffle(session["remaining"])
     session["checked"] = []
     session["score_numerator"] = 48
     session["score_denominator"] = 48
